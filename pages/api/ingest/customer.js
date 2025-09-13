@@ -1,13 +1,14 @@
 import redisClient from "../../../libs/redis";
 
 const STREAM_NAME='customer_stream';
-const client = await redisClient();
+
 export default async function (req, res){
     if(req.method!='POST'){
         return res.status(405).json({message:'METHOD NOT ALLOWED'});
 
     }
     try{
+        const client = await redisClient();
         const {name,email}=req.body;
         if(!name || !email){
             return res.status(400).json({message : 'Name and email are required'});

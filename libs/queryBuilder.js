@@ -3,6 +3,14 @@ export function MongoQuery(rules){
         return {};
     }
     const query={$and : []};
+     const operatorMap = {
+    'eq': '$eq', 
+    'gt': '$gt',   
+    'gte': '$gte', 
+    'lt': '$lt',   
+    'lte': '$lte', 
+    'ne': '$ne'    
+  };
      rules.forEach(rule => {
     const { field, operator, value } = rule;
     const mongoOperator = operatorMap[operator];

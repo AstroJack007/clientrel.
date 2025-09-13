@@ -14,7 +14,10 @@ async function connect() {
     if(cached.conn){
         return cached.conn;
     }
-    if(!cached.promise){ //prevents starting multiple connections at the same time.
+    if(!cached.promise){//prevents starting multiple connections at the same time.
+          const opts = {
+            bufferCommands: false,
+        }; 
         cached.promise=mongoose.connect(MONGO_URI,opts).then((m)=>{
             return m;
         });
