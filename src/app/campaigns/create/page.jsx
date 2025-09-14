@@ -83,12 +83,13 @@ function CreateCampaignPage() {
       }),
     });
   };
-
-  const handleLaunch = () => {
+ const handleLaunch = () => {
     if (audienceSize != null && rules != null) {
       const params = new URLSearchParams({
         audienceSize: String(audienceSize),
         rules: JSON.stringify(rules),
+        logic: logic,
+        connectors: JSON.stringify(connectors),
       });
       router.push(`/campaigns/create/launch?${params.toString()}`);
     }

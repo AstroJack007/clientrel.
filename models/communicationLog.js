@@ -22,7 +22,7 @@ const communicationLogSchema= new mongoose.Schema({
  
   deliveryDetails: [{
     customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
-    status: { type: String, enum: ['SENT', 'FAILED'], default: 'PENDING' }
+    status: { type: String, enum: ['SENT', 'FAILED', 'PENDING'], default: 'PENDING' }
   }],
  
   createdBy: {

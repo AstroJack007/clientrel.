@@ -9,10 +9,9 @@ export default function LaunchPage() {
   const searchParams = useSearchParams();
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
   const audienceSize = useMemo(() => {
-    
-    const val = searchParams.get("audienceSize");
-   return val;
+    return searchParams.get("audienceSize");
   }, [searchParams]);
   
   const rules = useMemo(() => {
@@ -25,6 +24,22 @@ export default function LaunchPage() {
     }
   }, [searchParams]);
 
+  // --- Add these two useMemo blocks ---
+  const logic = useMemo(() => {
+    return searchParams.get("logic") || 'AND';
+  }, [searchParams]);
+
+  const connectors = useMemo(() => {
+    const raw = searchParams.get("connectors");
+    if (!raw) return [];
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }, [searchParams]);
+  // ------------------------------------
+
   const onCancel = () => router.back();
 
   const onConfirm = async () => {
@@ -34,7 +49,13 @@ export default function LaunchPage() {
       const res = await fetch("/api/campaigns/Createcampaign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rules, message, audience:audienceSize }),
+        
+        body: JSON.stringify({
+          rules,
+          message,
+          logic,
+          connectors,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

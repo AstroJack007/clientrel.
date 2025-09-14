@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
     await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
 
-    fetch(`${process.env.NEXTAUTH_URL}/api/campaigns/delivery-receipt`, {
+    fetch(`${process.env.NEXTAUTH_URL}/api/campaigns/deliveryreceipt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
