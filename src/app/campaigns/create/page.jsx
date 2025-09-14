@@ -5,69 +5,43 @@ import AuthCheck from '../../../../components/AuthCheck';
 import useFetch from '../../../../hooks/useFetch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faTrash, faPlus, faUserGroup } from '@fortawesome/free-solid-svg-icons';
-
+import { useRouter } from "next/navigation";
 function CreateCampaignPage() {
   const [naturalLanguageInput, setNaturalLanguageInput] = useState("Customers who spent more than 5000 and haven't visited in the last 6 months");
   const [rules, setRules] = useState([]);
-  const [logic, setLogic] = useState('AND'); // default connector for new/override
-  const [connectors, setConnectors] = useState([]); // per-join connectors between rules (length = rules.length - 1)
+  const [logic, setLogic] = useState('AND'); 
+  const [connectors, setConnectors] = useState([]);
 
-  // Separate fetchers
   const { data: aiData, error: aiError, isLoading: isGenerating, executeFetch: fetchAiRules } = useFetch();
   const { data: previewData, error: previewError, isLoading: isPreviewing, executeFetch: fetchPreview } = useFetch();
+  const router=useRouter();
 
-  // Safer audience size read
   const audienceSize = typeof previewData?.audienceSize === 'number' ? previewData.audienceSize : null;
 
   useEffect(() => {
     if (!aiData) return;
+
     const nextRules = Array.isArray(aiData?.rules) ? aiData.rules : (Array.isArray(aiData) ? aiData : null);
-    if (nextRules) setRules(nextRules);
-
-    // Try to derive logic from AI response if present
-    const maybeLogic = aiData?.logicalOperator || aiData?.logic || aiData?.conjunction || aiData?.combine || aiData?.operator;
-    if (typeof maybeLogic === 'string') {
-      const upper = maybeLogic.toUpperCase();
-      if (upper === 'AND' || upper === 'OR') setLogic(upper);
+    if (nextRules) {
+      setRules(nextRules);
     }
 
-    // If the AI provides connectors, use them; else fill from logic
-    const aiConnectors = Array.isArray(aiData?.connectors)
-      ? aiData.connectors.map(c => (typeof c === 'string' ? c.toUpperCase() : 'AND'))
-      : null;
-    if (Array.isArray(nextRules)) {
-      const needed = Math.max(0, nextRules.length - 1);
-      if (aiConnectors && aiConnectors.length) {
-        const normalized = [...aiConnectors];
-        while (normalized.length < needed) normalized.push((maybeLogic || logic || 'AND').toString().toUpperCase());
-        setConnectors(normalized.slice(0, needed));
-      } else {
-        setConnectors(new Array(needed).fill((maybeLogic || logic || 'AND').toString().toUpperCase()));
-      }
+    const maybeLogic = aiData?.logic?.toUpperCase();
+    if (maybeLogic === 'AND' || maybeLogic === 'OR' || maybeLogic === 'MIXED') {
+      setLogic(maybeLogic);
     }
-  }, [aiData]);
 
-  const addRule = () => {
-    setRules(prev => {
-      const next = [...prev, { field: 'totalSpends', operator: 'gt', value: '' }];
-      // when adding a rule, add a connector joining previous last and the new one
-      setConnectors(cPrev => (next.length > 1 ? [...cPrev, logic] : []));
-      return next;
-    });
+    if (maybeLogic === 'MIXED' && Array.isArray(aiData.connectors)) {
+      setConnectors(aiData.connectors);
+    } else {
+      setConnectors([]);
+    }
+  }, [aiData]);  const addRule = () => {
+    setRules([...rules, { field: 'totalSpends', operator: 'gt', value: '' }]);
   };
 
   const removeRule = (indexToRemove) => {
-    setRules(prev => prev.filter((_, index) => index !== indexToRemove));
-    // remove the connector adjacent to the removed rule
-    setConnectors(prev => {
-      const next = [...prev];
-      if (indexToRemove < next.length) {
-        next.splice(indexToRemove, 1); // connector between removed and next
-      } else if (indexToRemove - 1 >= 0 && indexToRemove - 1 < next.length) {
-        next.splice(indexToRemove - 1, 1); // if last rule removed, remove connector before it
-      }
-      return next;
-    });
+    setRules(rules.filter((_, index) => index !== indexToRemove));
   };
 
   const updateRule = (index, field, value) => {
@@ -76,24 +50,20 @@ function CreateCampaignPage() {
     setRules(newRules);
   };
 
-  const updateConnector = (index, value) => {
-    const val = (value || '').toString().toUpperCase() === 'OR' ? 'OR' : 'AND';
-    setConnectors(prev => {
-      const next = [...prev];
-      next[index] = val;
-      return next;
-    });
+  const toggleConnector = (connectorIndex) => {
+    if (logic !== 'MIXED') return;
+    const newConnectors = [...connectors];
+    newConnectors[connectorIndex] = newConnectors[connectorIndex] === 'AND' ? 'OR' : 'AND';
+    setConnectors(newConnectors);
   };
 
   const handleNaturalLanguageSubmit = async () => {
     if (!naturalLanguageInput.trim()) return;
 
-    // Derive connectors hint from the typed text (sequence of AND/OR between clauses)
-    const found = (naturalLanguageInput.match(/\b(?:and|or)\b/gi) || []).map((m) => m.toUpperCase());
-    const connectorsHint = found.map((c) => (c === 'OR' ? 'OR' : 'AND'));
-
-    const payload = { prompt: naturalLanguageInput, preferredLogic: logic, connectorsHint };
-    console.log("payload",payload);
+    const payload = { 
+      prompt: naturalLanguageInput,
+    };
+    
     await fetchAiRules('/api/ai/generate-rules', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -108,13 +78,20 @@ function CreateCampaignPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         rules,
-        connectors,
         logic,
-        operator: logic,
-        conjunction: logic.toLowerCase(),
-        combine: logic.toLowerCase(),
+        connectors, 
       }),
     });
+  };
+
+  const handleLaunch = () => {
+    if (audienceSize != null && rules != null) {
+      const params = new URLSearchParams({
+        audienceSize: String(audienceSize),
+        rules: JSON.stringify(rules),
+      });
+      router.push(`/campaigns/create/launch?${params.toString()}`);
+    }
   };
 
   return (
@@ -150,53 +127,25 @@ function CreateCampaignPage() {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-700">Rule Builder</h2>
-            <div className="flex items-center gap-2" role="group" aria-label="Default connector">
-              <button
-                type="button"
-                onClick={() => {
-                  setLogic('AND');
-                  setConnectors(prev => prev.map(() => 'AND')); // apply globally
-                }}
-                className={`px-3 py-1 text-sm rounded-md border ${logic === 'AND' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
-              >
-                AND
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setLogic('OR');
-                  setConnectors(prev => prev.map(() => 'OR')); // apply globally
-                }}
-                className={`px-3 py-1 text-sm rounded-md border ${logic === 'OR' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
-              >
-                OR
-              </button>
-            </div>
+            {/* AND / OR buttons removed */}
           </div>
 
-          <p className="text-xs text-gray-500 mb-3">Default connector for new conditions: <span className="font-semibold">{logic}</span>. You can change the connector between specific conditions below.</p>
+          <p className="text-xs text-gray-500 mb-3">
+            Conditions are combined using <span className="font-semibold">{logic}</span>.
+          </p>
 
           <div className="space-y-3">
             {rules.map((rule, index) => (
               <Fragment key={index}>
                 {index > 0 && (
-                  <div className="flex items-center justify-center">
-                    <div className="inline-flex rounded-md border border-gray-300 overflow-hidden" role="group" aria-label={`Connector ${index-1}`}>
-                      <button
-                        type="button"
-                        onClick={() => updateConnector(index - 1, 'AND')}
-                        className={`px-2 py-0.5 text-xs ${connectors[index - 1] === 'AND' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-                      >
-                        AND
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => updateConnector(index - 1, 'OR')}
-                        className={`px-2 py-0.5 text-xs ${connectors[index - 1] === 'OR' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-                      >
-                        OR
-                      </button>
-                    </div>
+                  <div className="relative text-center">
+                    <button
+                      onClick={() => toggleConnector(index - 1)}
+                      disabled={logic !== 'MIXED'}
+                      className="text-xs text-gray-500 select-none px-2 py-1 rounded-md border border-transparent hover:border-gray-300 disabled:cursor-not-allowed disabled:hover:border-transparent"
+                    >
+                      — {logic === 'MIXED' ? (connectors[index - 1] || '...') : logic} —
+                    </button>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
@@ -228,8 +177,8 @@ function CreateCampaignPage() {
             <button onClick={handlePreview} disabled={isPreviewing} className="px-4 py-2 text-sm font-semibold bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50">
               {isPreviewing ? "Calculating..." : "Preview"}
             </button>
-            <button disabled={isPreviewing} className="px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
-              Save Audience
+            <button disabled={isPreviewing}  onClick={handleLaunch} className="px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
+             Launch Campaign
             </button>
           </div>
         </div>

@@ -16,17 +16,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { rules, connectors, logic, operator, conjunction, combine } = req.body;
+    const { rules, logic, connectors } = req.body;
 
-    // Derive connectors from legacy logic keys if not explicitly provided
-    let joins = Array.isArray(connectors) ? connectors : null;
-    if (!joins && (logic || operator || conjunction || combine)) {
-      const hint = (logic || operator || conjunction || combine || 'AND').toString().toUpperCase();
-      // create a joins array of uniform hint for N-1 gaps
-      joins = Array.isArray(rules) ? new Array(Math.max(0, rules.length - 1)).fill(hint) : [];
-    }
-
-    const mongoQuery = MongoQuery(rules, joins);
+  
+    const mongoQuery = MongoQuery({rules, logic, connectors});
 
    
     await connect();

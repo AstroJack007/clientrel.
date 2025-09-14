@@ -1,66 +1,63 @@
-export function MongoQuery(rules, connectors) {
- 
+export function MongoQuery({ rules, logic, connectors = [] }) {
   if (!rules || rules.length === 0) {
     return {};
   }
 
-  const toMongoCondition = (rule) => {
-    const operatorMap = {
-      eq: '$eq',
-      gt: '$gt',
-      gte: '$gte',
-      lt: '$lt',
-      lte: '$lte',
-      ne: '$ne',
-    };
-    const { field, operator, value } = rule || {};
+  const operatorMap = {
+    eq: '$eq',
+    gt: '$gt',
+    gte: '$gte',
+    lt: '$lt',
+    lte: '$lte',
+    ne: '$ne'
+  };
+
+  const processRule = (rule) => {
+    const { field, operator, value } = rule;
     const mongoOperator = operatorMap[operator];
-    if (!field || !mongoOperator) return null;
+    if (!mongoOperator) return null;
 
     let processedValue = value;
     if (field === 'totalSpends' || field === 'visitCount') {
       processedValue = Number(value);
+      if (isNaN(processedValue)) return null;
     } else if (field === 'lastSeen') {
       processedValue = new Date(value);
     }
+
     return { [field]: { [mongoOperator]: processedValue } };
   };
 
-
-  const conditions = rules
-    .map(toMongoCondition)
-    .filter(Boolean);
-
+  const conditions = rules.map(processRule).filter(Boolean);
   if (conditions.length === 0) return {};
 
-  if (conditions.length === 1) return conditions[0];
 
-  const joins = Array.isArray(connectors)
-    ? connectors.map((c) => (typeof c === 'string' ? c.toUpperCase() : 'AND'))
-    : [];
-  while (joins.length < conditions.length - 1) joins.push('AND');
-
-  const groups = [];
-  let currentGroup = [];
-
-  for (let i = 0; i < conditions.length; i++) {
-    currentGroup.push(conditions[i]);
-    const isLast = i === conditions.length - 1;
-    const join = isLast ? null : joins[i];
-    if (isLast || join === 'OR') {
-      
-      if (currentGroup.length === 1) {
-        groups.push(currentGroup[0]);
-      } else {
-        groups.push({ $and: currentGroup });
-      }
-      currentGroup = [];
+  if (connectors.length === 0) {
+    if (logic.toUpperCase() === 'AND') {
+      return { $and: conditions };
+    } else {
+      return { $or: conditions };
     }
   }
 
-  if (groups.length === 1) {
-  
-    return typeof groups[0] === 'object' ? groups[0] : {};
+
+  if (logic === 'MIXED') {
+    let current = conditions[0];
+
+    for (let i = 0; i < connectors.length; i++) {
+      const connector = connectors[i].toUpperCase();
+      const nextCondition = conditions[i + 1];
+      if (!nextCondition) break;
+
+      if (connector === 'AND') {
+        current = { $and: [current, nextCondition] };
+      } else {
+        current = { $or: [current, nextCondition] };
+      }
+    }
+
+    return current;
   }
-  return { $or: groups };
+
+  return {};
 }
