@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "consume": "node scripts/redis-consumer.js",
-    "seed":"node seed/seed.js"
+    "seed-cus":"node seed/seed-customer.js",
+    "seed-order":"node seed/seed-order.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.0.1",

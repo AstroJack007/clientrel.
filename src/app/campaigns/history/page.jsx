@@ -33,8 +33,14 @@ function HistoryCards() {
   useEffect(() => {
     executeFetch('/api/campaigns/history');
   }, [executeFetch]);
+  const getTime = (d) => {
+    const t = Date.parse(d);
+    return Number.isNaN(t) ? 0 : t;
+  };
 
-  const campaigns = Array.isArray(data?.campaigns) ? data.campaigns : [];
+  const campaigns = Array.isArray(data?.campaigns)
+    ? [...data.campaigns].sort((a, b) => getTime(b.createdAt) - getTime(a.createdAt))
+    : [];
 
   return (
     <div className="px-6 py-6 max-w-5xl mx-auto">
