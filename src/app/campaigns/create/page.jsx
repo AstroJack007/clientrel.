@@ -29,21 +29,10 @@ function CreateCampaignPage() {
     setRules(newRules);
   };
 
-  const handleNaturalLanguageSubmit = () => {
   
-    console.log("Simulating AI processing for:", naturalLanguageInput);
-
-    if (naturalLanguageInput.includes("5000") && naturalLanguageInput.includes("6 months")) {
-      setRules([
-        { field: 'totalSpends', operator: 'gt', value: '5000' },
-        
-        { field: 'lastSeen', operator: 'lt', value: '6' } 
-      ]);
-    }
-  };
 
   const handlePreview = () => {
-    // Send the current rules to the API for audience size preview
+ 
     executeFetch('/api/audience/preview', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

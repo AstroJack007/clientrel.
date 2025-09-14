@@ -17,10 +17,12 @@
     "@fortawesome/react-fontawesome": "^3.0.2",
     "@google-cloud/vertexai": "^1.10.0",
     "dotenv": "^17.2.2",
+    "groq-sdk": "^0.32.0",
     "mongodb": "^6.19.0",
     "mongoose": "^8.18.1",
     "next": "15.5.3",
     "next-auth": "^4.24.11",
+    "openai": "^5.20.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "redis": "^5.8.2"

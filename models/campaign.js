@@ -1,0 +1,34 @@
+import mongoose from "mongoose";
+
+const Campaign= new mongoose.Schema({
+  
+  audienceQuery: {
+    type: String,
+    required: true,
+  },
+  message: {
+    type: String,
+    required: true,
+  },
+  audienceSize: {
+    type: Number,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ['PENDING', 'PROCESSING', 'SENT', 'FAILED'],
+    default: 'PENDING',
+  },
+ 
+  deliveryDetails: [{
+    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
+    status: { type: String, enum: ['SENT', 'FAILED'], default: 'PENDING' }
+  }],
+ 
+  createdBy: {
+    type: String,
+    required: true,
+  }
+}, { timestamps: true });
+
+export default mongoose.models.Campaign || mongoose.model('Campaign', CampaignSchema);
