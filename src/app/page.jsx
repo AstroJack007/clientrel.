@@ -26,9 +26,9 @@ export default function Page() {
   }
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center">
-      <Header/>
+     
       <div className="flex items-center justify-between gap-4">
-        <FontAwesomeIcon icon={faCubes} className="!h-10 !w-10" />
+        <FontAwesomeIcon icon={faCubes} className="!h-10 !w-10 text-blue-600" />
         <p className="text-3xl font-bold">Xeno</p>
       </div>
 

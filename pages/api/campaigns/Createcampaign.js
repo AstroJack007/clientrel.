@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
 import connect from "../../../libs/mongodb";
 import customer from "../../../models/customer";
-import Campaign from "../../../models/Campaign"
+import Campaign from "../../../models/communicationLog"
 import { MongoQuery } from "../../../libs/queryBuilder";
 
 export default async function handler(req, res) {

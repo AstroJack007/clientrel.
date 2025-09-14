@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 import connect from "../../../libs/mongodb";
-import Campaign from "../../../models/Campaign";
+import Campaign from "../../../models/communicationLog";
 
 export default async function GetcampaignHistory(req, res) {
   if (req.method !== "GET") {
