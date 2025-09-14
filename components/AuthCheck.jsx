@@ -9,9 +9,8 @@ const AuthCheck = ({ children }) => {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      // Redirect to NextAuth's built-in sign-in page
-      // Prefer signIn() to avoid hard-coding a /signin route that may not exist
-      signIn();
+      
+      router.push('/');
     }
   }, [status, router]);
 

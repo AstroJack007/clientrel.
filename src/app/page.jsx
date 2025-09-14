@@ -6,7 +6,7 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-
+import Header from "../../components/Header";
 export default function Page() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -26,7 +26,11 @@ export default function Page() {
   }
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center">
-  <FontAwesomeIcon icon={faCubes} className="!h-10 !w-10" />
+      <Header/>
+      <div className="flex items-center justify-between gap-4">
+        <FontAwesomeIcon icon={faCubes} className="!h-10 !w-10" />
+        <p className="text-3xl font-bold">Xeno</p>
+      </div>
 
       <div className="text-4xl font-bold text-gray-900">
         Sign in to your account
@@ -40,7 +44,6 @@ export default function Page() {
           <FontAwesomeIcon icon={faGoogle} />
           <span>Sign in with Google</span>
         </button>
-
       </div>
     </div>
   );

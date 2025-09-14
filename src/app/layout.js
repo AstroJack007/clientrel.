@@ -1,5 +1,6 @@
 import "./globals.css";
 import Providers from "./providers";
+import Header from "../../components/Header";
 
 export const metadata = {
   title: "Xeno CRM",
@@ -10,7 +11,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Header />
+          <div className="pt-16">{children}</div>
+        </Providers>
       </body>
     </html>
   );

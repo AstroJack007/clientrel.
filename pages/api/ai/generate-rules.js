@@ -28,7 +28,7 @@ Another example, "more than 30 days ago" means the lastSeen date should be 'lt' 
 
 export default async function generateRules(req, res) {
   const session = await getServerSession(req, res, authOptions);
-  if (!sessison) {
+  if (!session) {
     return res.status(401).json({ message: "Unauthorized" });
   }
   if (req.method !== "POST") {
@@ -40,7 +40,7 @@ export default async function generateRules(req, res) {
         return res.status(400).json({message:"Prompt Required"});
     }
 
-   const chat=await groq.chat.completions.create({
+   const chat=await client.chat.completions.create({
         messages: [
           { role:'system',content:Groqprompt},
           {
@@ -52,7 +52,7 @@ export default async function generateRules(req, res) {
         temperature:0.2,
         response_format:{type:'json_object'}
       });
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+      const result = JSON.parse(chat.choices[0].message.content || "{}");
       return res.status(200).json(result);
     }catch(err) {
         console.error('Error with Groq AI : ',err);

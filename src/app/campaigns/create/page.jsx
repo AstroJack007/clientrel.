@@ -29,10 +29,12 @@ function CreateCampaignPage() {
     setRules(newRules);
   };
 
-  
+  const handleNaturalLanguageSubmit=()=>{
+    
+  }
 
   const handlePreview = () => {
- 
+    
     executeFetch('/api/audience/preview', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const Campaign= new mongoose.Schema({
+const CampaignSchema= new mongoose.Schema({
   
   audienceQuery: {
     type: String,
