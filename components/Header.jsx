@@ -27,7 +27,7 @@ export default function Header() {
   const isActive = (href) => (pathname === href ? "text-blue-600" : "text-gray-700 hover:text-gray-900");
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-gray-200 bg-white/70 backdrop-blur-md">
+  <header className="fixed inset-x-0 top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between">
           {/* Brand */}
@@ -41,7 +41,7 @@ export default function Header() {
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6">
             {nav.map((item) => (
-              <Link key={item.href} href={item.href} className={`text-sm font-medium ${isActive(item.href)}`}>
+              <Link key={item.href} href={item.href} className={`text-sm font-medium px-1 py-1 rounded-md ${isActive(item.href)}`}>
                 {item.label}
               </Link>
             ))}
@@ -57,14 +57,20 @@ export default function Header() {
                 </div>
                 <button
                   onClick={() => signOut()}
-                  className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-gray-800"
+                  className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
                 >
                   <FontAwesomeIcon icon={faRightFromBracket} />
                   Sign out
                 </button>
               </>
             ) : (
-              <></>
+              <button
+                onClick={() => signIn("google")}
+                className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                <FontAwesomeIcon icon={faRightToBracket} />
+                Sign in
+              </button>
             )}
           </div>
 

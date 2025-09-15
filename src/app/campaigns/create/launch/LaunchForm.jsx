@@ -2,6 +2,9 @@
 
 import { useMemo, useState, useRef } from "react";
 import AuthCheck from "../../../../../components/AuthCheck";
+import Card, { CardBody } from "../../../../../components/ui/Card";
+import Button from "../../../../../components/ui/Button";
+import Spinner from "../../../../../components/ui/Spinner";
 import { useRouter, useSearchParams } from "next/navigation";
 
 // All your original page logic is now in this component
@@ -73,27 +76,35 @@ export default function LaunchForm() {
   return (
     <AuthCheck>
       <div className="flex min-h-screen items-center justify-center bg-black/30 p-4">
-        <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
-          <h2 className="text-xl font-bold">Launch a New Campaign</h2>
-          <p className="text-gray-600 mt-1">
-            Audience: <span className="font-semibold">{audienceSize}</span> customers
-          </p>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Write your campaign message here..."
-            className="w-full mt-4 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            rows={4}
-          />
-          <div className="mt-5 flex justify-between gap-3">
-            <button onClick={onCancel} className="flex-1 py-2 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-100" disabled={submitting}>
-              Cancel
-            </button>
-            <button onClick={onConfirm} disabled={!message.trim() || !rules || submitting} className={`flex-1 py-2 rounded-xl text-white font-semibold transition ${ message.trim() && rules && !submitting ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-300 cursor-not-allowed" }`}>
-              {submitting ? "Launching..." : "Confirm & Launch"}
-            </button>
-          </div>
-        </div>
+        <Card className="w-full max-w-md">
+          <CardBody>
+            <div className="text-center">
+              <h2 className="text-xl font-bold">Launch a New Campaign</h2>
+              <p className="text-gray-600 mt-1">
+                Audience: <span className="font-semibold">{audienceSize}</span> customers
+              </p>
+            </div>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Write your campaign message here..."
+              className="w-full mt-4 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows={4}
+            />
+            <div className="mt-5 flex justify-between gap-3">
+              <Button onClick={onCancel} variant="outline" className="flex-1" disabled={submitting}>
+                Cancel
+              </Button>
+              <Button onClick={onConfirm} disabled={!message.trim() || !rules || submitting} className="flex-1">
+                {submitting ? (
+                  <span className="inline-flex items-center gap-2"><Spinner size={16} /> Launching...</span>
+                ) : (
+                  "Confirm & Launch"
+                )}
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
       </div>
     </AuthCheck>
   );

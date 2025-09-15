@@ -16,8 +16,7 @@ export default async function handler(req, res) {
 
     try {
         const { rules, message, logic, connectors } = req.body;
-
-        // Build a safe base URL for internal calls (works in prod, preview, and dev)
+        
         const proto = req.headers['x-forwarded-proto'] || 'https';
         const host = req.headers['x-forwarded-host'] || req.headers.host;
         const envBase = process.env.NEXTAUTH_URL || '';
@@ -46,11 +45,11 @@ export default async function handler(req, res) {
 
         await newCampaign.save();
 
-        // Concurrency-limited vendor dispatch to avoid overwhelming serverless in prod
+       
         const CONCURRENCY = 20;
         let idx = 0;
         const sendToVendor = async (customer) => {
-            const personalizedMessage = message.replace('{{name}}', customer.name);
+            const personalizedMessage = `Hi ${customer.name}! ${message} message sent by the vendor`;
             return fetch(`${origin}/api/vendor/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -68,24 +67,21 @@ export default async function handler(req, res) {
                 try {
                     await sendToVendor(audience[current]);
                 } catch (e) {
-                    // let fallback handle unacknowledged items
+                    
                 }
             }
         });
 
         await Promise.all(workers);
 
-        // Brief grace period for final receipts to arrive
         await new Promise((r) => setTimeout(r, 500));
 
-        // Fallback: mark any remaining PENDING deliveries as FAILED
         await Campaign.updateOne(
             { _id: newCampaign._id },
             { $set: { 'deliveryDetails.$[d].status': 'FAILED' } },
             { arrayFilters: [{ 'd.status': 'PENDING' }] }
         );
 
-        // Mark campaign as SENT to denote completion of dispatch phase
         await Campaign.updateOne({ _id: newCampaign._id }, { $set: { status: 'SENT' } });
 
 

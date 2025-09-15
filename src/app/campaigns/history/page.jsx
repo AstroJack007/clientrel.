@@ -4,6 +4,10 @@ import AuthCheck from '../../../../components/AuthCheck';
 import useFetch from '../../../../hooks/useFetch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserGroup, faCircleCheck, faCircleXmark, faPlus } from '@fortawesome/free-solid-svg-icons';
+import Card, { CardBody } from '../../../../components/ui/Card';
+import Button from '../../../../components/ui/Button';
+import EmptyState from '../../../../components/ui/EmptyState';
+import Spinner from '../../../../components/ui/Spinner';
 
 const formatLaunched = (dateString) => {
   try {
@@ -43,23 +47,23 @@ function HistoryCards() {
     : [];
 
   return (
-    <div className="px-6 py-6 max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Campaign History</h1>
-        <a
-          href="/campaigns/create"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-        >
+        <Button as="a" href="/campaigns/create" className="inline-flex items-center gap-2">
           <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
           Create New Campaign
-        </a>
+        </Button>
       </div>
-
-      {isLoading && <p>Loading...</p>}
-      {error && <p className="text-red-600">{String(error)}</p>}
+      {isLoading && (
+        <div className="flex items-center justify-center py-10"><Spinner /></div>
+      )}
+      {error && (
+        <div className="rounded-md bg-red-50 border border-red-200 p-4 text-red-800">{String(error)}</div>
+      )}
 
       {!isLoading && !error && campaigns.length === 0 && (
-        <div className="rounded-lg border bg-white p-6 text-center text-gray-600">No campaigns found.</div>
+        <EmptyState title="No campaigns yet" description="Create your first campaign to see it here." action={<Button as="a" href="/campaigns/create">Create campaign</Button>} />
       )}
 
       <ul className="space-y-4">
@@ -68,14 +72,18 @@ function HistoryCards() {
           const failed = (c.deliveryDetails || []).filter((d) => d.status === 'FAILED').length;
           const title = c.message || 'Campaign';
           return (
-            <li key={c._id} className="bg-white rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-              <p className="text-sm text-gray-500 mt-1">Launched: {formatLaunched(c.createdAt)}</p>
-              <div className="mt-4 flex items-center gap-6">
-                <Stat icon={faUserGroup} color="text-gray-600" value={c.audienceSize} label="Audience" />
-                <Stat icon={faCircleCheck} color="text-green-600" value={sent} label="Sent" />
-                <Stat icon={faCircleXmark} color="text-red-600" value={failed} label="Failed" />
-              </div>
+            <li key={c._id}>
+              <Card>
+                <CardBody>
+                  <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+                  <p className="text-sm text-gray-500 mt-1">Launched: {formatLaunched(c.createdAt)}</p>
+                  <div className="mt-4 flex items-center gap-6">
+                    <Stat icon={faUserGroup} color="text-gray-600" value={c.audienceSize} label="Audience" />
+                    <Stat icon={faCircleCheck} color="text-green-600" value={sent} label="Sent" />
+                    <Stat icon={faCircleXmark} color="text-red-600" value={failed} label="Failed" />
+                  </div>
+                </CardBody>
+              </Card>
             </li>
           );
         })}

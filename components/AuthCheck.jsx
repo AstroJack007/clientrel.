@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Spinner from "./ui/Spinner";
 
 const AuthCheck = ({ children }) => {
   const { status } = useSession();
@@ -16,8 +17,8 @@ const AuthCheck = ({ children }) => {
 
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Loading session....</p>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <Spinner />
       </div>
     );
   }

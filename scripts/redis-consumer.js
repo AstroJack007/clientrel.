@@ -53,12 +53,12 @@ async function main() {
   }
 
   await mongoose.connect(MONGO_URI);
-  console.log("✅ Consumer connected to MongoDB");
+  console.log("Consumer connected to MongoDB");
 
   const redisClient = createClient({ url: REDIS_URL });
   redisClient.on('error', (err) => console.error('Redis Client Error', err));
   await redisClient.connect();
-  console.log("✅ Consumer connected to Redis");
+  console.log("Consumer connected to Redis");
 
   // Create consumer groups for all streams
   for (const streamName of Object.keys(STREAMS)) {

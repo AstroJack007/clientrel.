@@ -10,7 +10,6 @@ export default async function handler(req, res) {
 
     await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
 
-    // Derive a robust origin to call internal APIs
     const proto = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     const envBase = process.env.NEXTAUTH_URL || '';

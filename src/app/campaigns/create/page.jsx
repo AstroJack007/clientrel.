@@ -6,6 +6,11 @@ import useFetch from '../../../../hooks/useFetch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faTrash, faPlus, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from "next/navigation";
+import Card, { CardBody, CardFooter, CardHeader } from '../../../../components/ui/Card';
+import Button from '../../../../components/ui/Button';
+import Input from '../../../../components/ui/Input';
+import Select from '../../../../components/ui/Select';
+import Spinner from '../../../../components/ui/Spinner';
 function CreateCampaignPage() {
   const [naturalLanguageInput, setNaturalLanguageInput] = useState("Customers who spent more than 5000 and haven't visited in the last 6 months");
   const [rules, setRules] = useState([]);
@@ -96,103 +101,116 @@ function CreateCampaignPage() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen p-8">
+    <div className="">
       <div className="max-w-4xl mx-auto">
-
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">AI Feature - Natural Language to Rules</h1>
-          <p className="text-gray-500 mt-1">Use natural language to generate audience rules instantly.</p>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Create Campaign</h1>
+          <p className="text-gray-600 mt-1">Use natural language to generate audience rules, refine them, preview, and launch.</p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <label htmlFor="nl-input" className="block text-sm font-medium text-gray-700 mb-2">Describe your audience in plain English...</label>
-          <div className="flex items-center gap-2">
-            <input
-              id="nl-input"
-              type="text"
-              value={naturalLanguageInput}
-              onChange={(e) => setNaturalLanguageInput(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., High-value customers who are at risk of leaving"
-            />
-            <button
-              onClick={handleNaturalLanguageSubmit}
-              className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-              disabled={isGenerating}
-            >
-              <FontAwesomeIcon icon={faArrowRight} className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
+        <Card className="mb-6">
+          <CardHeader>
+            <h2 className="text-base font-semibold text-gray-800">Describe your audience</h2>
+            <p className="mt-1 text-sm text-gray-600">We’ll convert this into rules you can tweak.</p>
+          </CardHeader>
+          <CardBody>
+            <div className="flex items-center gap-2">
+              <Input
+                id="nl-input"
+                type="text"
+                value={naturalLanguageInput}
+                onChange={(e) => setNaturalLanguageInput(e.target.value)}
+                placeholder="e.g., Customers who spent more than 5000 and haven't visited in 6 months"
+              />
+              <Button onClick={handleNaturalLanguageSubmit} aria-label="Generate rules" disabled={isGenerating}>
+                {isGenerating ? <Spinner size={18} /> : <FontAwesomeIcon icon={faArrowRight} className="h-4 w-4" />}
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
 
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-700">Rule Builder</h2>
-            {/* AND / OR buttons removed */}
-          </div>
-
-          <p className="text-xs text-gray-500 mb-3">
-            Conditions are combined using <span className="font-semibold">{logic}</span>.
-          </p>
-
-          <div className="space-y-3">
-            {rules.map((rule, index) => (
-              <Fragment key={index}>
-                {index > 0 && (
-                  <div className="relative text-center">
-                    <button
-                      onClick={() => toggleConnector(index - 1)}
-                      disabled={logic !== 'MIXED'}
-                      className="text-xs text-gray-500 select-none px-2 py-1 rounded-md border border-transparent hover:border-gray-300 disabled:cursor-not-allowed disabled:hover:border-transparent"
-                    >
-                      — {logic === 'MIXED' ? (connectors[index - 1] || '...') : logic} —
-                    </button>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold text-gray-800">Rule Builder</h2>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Conditions are combined using <span className="font-semibold">{logic}</span>.
+            </p>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-3">
+              {rules.map((rule, index) => (
+                <Fragment key={index}>
+                  {index > 0 && (
+                    <div className="relative text-center">
+                      <Button
+                        onClick={() => toggleConnector(index - 1)}
+                        disabled={logic !== 'MIXED'}
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-gray-600"
+                      >
+                        — {logic === 'MIXED' ? (connectors[index - 1] || '...') : logic} —
+                      </Button>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Select value={rule.field} onChange={(e) => updateRule(index, 'field', e.target.value)} className="w-1/3">
+                      <option value="totalSpends">Total Spend</option>
+                      <option value="lastSeen">Last Visit Date</option>
+                      <option value="visitCount">Visit Count</option>
+                    </Select>
+                    <Select value={rule.operator} onChange={(e) => updateRule(index, 'operator', e.target.value)} className="w-1/3">
+                      <option value="gt">is greater than</option>
+                      <option value="lt">is less than</option>
+                      <option value="eq">is equal to</option>
+                    </Select>
+                    <Input type="text" value={rule.value} onChange={(e) => updateRule(index, 'value', e.target.value)} placeholder="Value" />
+                    <Button onClick={() => removeRule(index)} variant="ghost" size="sm" className="text-gray-500 hover:text-red-600">
+                      <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </Fragment>
+              ))}
+            </div>
+            <div className="mt-4">
+              <Button onClick={addRule} variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+                <FontAwesomeIcon icon={faPlus} className="h-4 w-4 mr-2" />
+                Add Condition
+              </Button>
+            </div>
+          </CardBody>
+          <CardFooter>
+            <div className="flex justify-between items-center w-full">
+              <div>
+                {audienceSize !== null && (
+                  <div className="inline-flex items-center gap-2 rounded-md bg-blue-50 px-3 py-2 text-blue-800">
+                    <FontAwesomeIcon icon={faUserGroup} className="h-4 w-4" />
+                    <span className="text-sm font-semibold">Estimated Audience: {audienceSize}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-2">
-                  <select value={rule.field} onChange={(e) => updateRule(index, 'field', e.target.value)} className="p-2 border rounded-md w-1/4">
-                    <option value="totalSpends">Total Spend</option>
-                    <option value="lastSeen">Last Visit Date</option>
-                    <option value="visitCount">Visit Count</option>
-                  </select>
-                  <select value={rule.operator} onChange={(e) => updateRule(index, 'operator', e.target.value)} className="p-2 border rounded-md w-1/4">
-                    <option value="gt">is greater than</option>
-                    <option value="lt">is less than</option>
-                    <option value="eq">is equal to</option>
-                  </select>
-                  <input type="text" value={rule.value} onChange={(e) => updateRule(index, 'value', e.target.value)} placeholder="Value" className="p-2 border rounded-md flex-grow"/>
-                  <button onClick={() => removeRule(index)} className="text-gray-500 hover:text-red-600 p-2">
-                    <FontAwesomeIcon icon={faTrash} className="h-5 w-5" />
-                  </button>
-                </div>
-              </Fragment>
-            ))}
-          </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button onClick={handlePreview} disabled={isPreviewing} variant="outline">
+                  {isPreviewing ? (
+                    <div className="inline-flex items-center gap-2"><Spinner size={16} /> Calculating...</div>
+                  ) : (
+                    "Preview"
+                  )}
+                </Button>
+                <Button disabled={isPreviewing} onClick={handleLaunch}>
+                  Launch Campaign
+                </Button>
+              </div>
+            </div>
+          </CardFooter>
+        </Card>
 
-          <button onClick={addRule} className="mt-4 text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
-            <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-            Add Condition
-          </button>
-
-          <div className="border-t mt-6 pt-4 flex justify-end items-center gap-4">
-            <button onClick={handlePreview} disabled={isPreviewing} className="px-4 py-2 text-sm font-semibold bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50">
-              {isPreviewing ? "Calculating..." : "Preview"}
-            </button>
-            <button disabled={isPreviewing}  onClick={handleLaunch} className="px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
-             Launch Campaign
-            </button>
-          </div>
-        </div>
-
-        {audienceSize !== null && (
-          <div className="mt-6 p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-800 rounded-md flex items-center gap-3">
-            <FontAwesomeIcon icon={faUserGroup} className="h-5 w-5" />
-            <p className="font-bold">Estimated Audience Size: {audienceSize}</p>
-          </div>
-        )}
         {(aiError || previewError) && (
-          <div className="mt-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-md">
-            <p className="font-bold">Error: {aiError || previewError}</p>
+          <div className="mt-6 rounded-md bg-red-50 border border-red-200 p-4 text-red-800">
+            <p className="font-semibold">Error</p>
+            <p className="text-sm">{String(aiError || previewError)}</p>
           </div>
         )}
 
