@@ -146,8 +146,13 @@ npm run build
 :: Start production server
 npm run start
 ```
+# Architecture
+
+![Architecture Diagram](https://github.com/user-attachments/assets/6259b43e-e372-42cb-8002-bd6f800b93c2)
 
 ## Customization
 - UI built with Tailwind CSS (see `globals.css`)
 - Easily extend with new campaigns, rules, or integrations
+
+
 
