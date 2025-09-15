@@ -17,6 +17,12 @@ export default async function handler(req, res) {
     try {
         const { rules, message, logic, connectors } = req.body;
 
+        // Build a safe base URL for internal calls (works in prod, preview, and dev)
+        const proto = req.headers['x-forwarded-proto'] || 'https';
+        const host = req.headers['x-forwarded-host'] || req.headers.host;
+        const envBase = process.env.NEXTAUTH_URL || '';
+        const origin = (envBase ? envBase : `${proto}://${host}`).replace(/\/$/, '');
+
         if (!rules || !message) {
             return res.status(400).json({ message: "Rules and message are required" });
         }
@@ -42,7 +48,7 @@ export default async function handler(req, res) {
 
         const vendorPromises = audience.map(customer => {
             const personalizedMessage = message.replace('{{name}}', customer.name);
-            return fetch(`${process.env.NEXTAUTH_URL}/api/vendor/send`, {
+            return fetch(`${origin}/api/vendor/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
