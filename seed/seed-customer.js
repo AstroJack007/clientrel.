@@ -13,7 +13,7 @@ if (!MONGO_URI || !REDIS_URL) {
 const CUSTOMER_STREAM = "customer_stream";
 
 async function seedCustomers() {
-  // 1. Connect to MongoDB and clear existing data
+ 
   await mongoose.connect(MONGO_URI);
   console.log("Connected to MongoDB to clear data...");
   await Customer.deleteMany({});
@@ -23,7 +23,6 @@ async function seedCustomers() {
   console.log("Disconnected from MongoDB.");
 
 
-  // 2. Connect to Redis to publish new customers
   const redisClient = createClient({ url: REDIS_URL });
   await redisClient.connect();
   console.log("Seeder connected to Redis to seed customers.");

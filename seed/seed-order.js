@@ -12,7 +12,7 @@ async function seedOrders() {
     throw new Error("MONGO_URI and REDIS_URL must be defined in your .env file");
   }
 
-  // 1. Connect to MongoDB to get the customers
+
   await mongoose.connect(MONGO_URI);
   console.log("Connected to MongoDB to fetch customers...");
   const customers = await Customer.find({});
@@ -30,7 +30,7 @@ async function seedOrders() {
 
   let totalOrders = 0;
   for (const customer of customers) {
-    const numOrders = Math.floor(Math.random() * 15) + 1; // 1 to 15 orders
+    const numOrders = Math.floor(Math.random() * 15) + 1; 
     for (let j = 0; j < numOrders; j++) {
       const orderAmount = Math.floor(Math.random() * 2000) + 100;
       await redisClient.xAdd(ORDER_STREAM, '*', {
