@@ -1,36 +1,153 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+# Xeno CRM
+
+A modern, AI-powered customer engagement platform built with Next.js, MongoDB, and Redis.
+
+## Features
+
+- Google sign-in authentication (NextAuth)
+- AI-powered audience rule builder (natural language to rules)
+- Campaign creation, preview, and launch flows
+- Campaign history with delivery stats
+- Responsive, clean UI with reusable components (Tailwind CSS)
+- MongoDB for data, Redis for fast queueing
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+
+- MongoDB instance (local or Atlas)
+- Redis instance (local or cloud)
+- Google OAuth credentials (for sign-in)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Setup
+1. **Clone the repo:**
+	```sh
+	git clone <your-repo-url>
+	cd xeno-crm-project
+	```
+2. **Install dependencies:**
+	```sh
+	npm install
+	```
+3. **Configure environment:**
+	- Copy `.env.example` to `.env` and fill in MongoDB, Redis, and Google credentials.
+
+4. **(Optional) Seed sample data:**
+	```sh
+	npm run seed-cus
+	npm run seed-order
+	```
+
+### Running the App
+- **Development:**
+  ```sh
+  npm run dev
+  ```
+- Visit [http://localhost:3000](http://localhost:3000)
+
+### Scripts
+- `npm run dev` — Start development server
+- `npm run build` — Build for production
+- `npm run start` — Start production server
+- `npm run lint` — Lint code
+- `npm run consume` — Start Redis consumer
+- `npm run seed-cus` — Seed customers
+- `npm run seed-order` — Seed orders
+- `npm run strip-comments` — Remove comments from all code files
+
+
+## Project Structure
+
+```
+xeno-crm-project/
+	.env
+	eslint.config.mjs
+	jsconfig.json
+	next.config.mjs
+	package.json
+	postcss.config.mjs
+	README.md
+	components/
+		AuthCheck.jsx
+		Header.jsx
+		ui/
+			Button.jsx
+			Card.jsx
+			EmptyState.jsx
+			Input.jsx
+			Select.jsx
+			Spinner.jsx
+	hooks/
+		useFetch.js
+	libs/
+		mongodb.js
+		queryBuilder.js
+		redis.js
+	models/
+		communicationLog.js
+		customer.js
+		orders.js
+	pages/
+		api/
+			ai/generate-rules.js
+			audience/preview.js
+			auth/[...nextauth].js
+			campaigns/Createcampaign.js
+			campaigns/deliveryreceipt.js
+			campaigns/history.js
+			ingest/customer.js
+			ingest/order.js
+			vendor/send.js
+	public/
+		*.svg
+	scripts/
+		clear-redis.js
+		redis-consumer.js
+	seed/
+		seed-customer.js
+		seed-order.js
+	src/
+		app/
+			favicon.ico
+			globals.css
+			layout.js
+			page.jsx
+			providers.jsx
+			campaigns/
+				create/
+					page.jsx
+					launch/
+						LaunchForm.jsx
+						page.jsx
+				history/
+					page.jsx
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Commands to run (Windows cmd)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```cmd
+:: Install dependencies
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+:: Start the Next.js dev server
+npm run dev
 
-## Learn More
+:: Seed sample data (optional)
+npm run seed-cus
+npm run seed-order
 
-To learn more about Next.js, take a look at the following resources:
+:: Start the Redis consumer (in another terminal)
+npm run consume
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+:: Build for production
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+:: Start production server
+npm run start
+```
 
-## Deploy on Vercel
+## Customization
+- UI built with Tailwind CSS (see `globals.css`)
+- Easily extend with new campaigns, rules, or integrations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
