@@ -146,6 +146,8 @@ npm run build
 :: Start production server
 npm run start
 ```
+##Architecture 
+<img width="3840" height="3173" alt="Untitled diagram _ Mermaid Chart-2025-09-15-141216" src="https://github.com/user-attachments/assets/6259b43e-e372-42cb-8002-bd6f800b93c2" />
 
 ## Customization
 - UI built with Tailwind CSS (see `globals.css`)
