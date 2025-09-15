@@ -40,9 +40,9 @@ export default async function handler(req, res) {
 
         await newCampaign.save();
 
-        for (const customer of audience) {
+        const vendorPromises = audience.map(customer => {
             const personalizedMessage = message.replace('{{name}}', customer.name);
-            fetch(`${process.env.NEXTAUTH_URL}/api/vendor/send`, {
+            return fetch(`${process.env.NEXTAUTH_URL}/api/vendor/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -51,10 +51,12 @@ export default async function handler(req, res) {
                     message: personalizedMessage,
                 }),
             });
-        }
-        setTimeout(async () => {
-            await Campaign.updateOne({_id: newCampaign._id }, { $set: { status: 'SENT' } });
-        }, 5000); 
+        });
+
+      
+        await Promise.allSettled(vendorPromises);
+
+        await Campaign.updateOne({ _id: newCampaign._id }, { $set: { status: 'SENT' } });
 
 
         return res.status(201).json({
