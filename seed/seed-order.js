@@ -23,12 +23,11 @@ async function seedOrders() {
   }
   console.log(`Found ${customers.length} customers to create orders for.`);
 
-  // 2. Connect to Redis to publish orders
+
   const redisClient = createClient({ url: REDIS_URL });
   await redisClient.connect();
   console.log("Connected to Redis to seed orders.");
 
-  // 3. Create and publish orders for each customer
   let totalOrders = 0;
   for (const customer of customers) {
     const numOrders = Math.floor(Math.random() * 15) + 1; // 1 to 15 orders

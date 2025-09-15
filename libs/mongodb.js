@@ -8,13 +8,13 @@ if(!MONGO_URI){
 
 let cached =global.mongoose;
 if(!cached){
-    cached=global.mongoose={conn:null,promise:null} //only create connection once across multiple reload
+    cached=global.mongoose={conn:null,promise:null} 
 }
 async function connect() {
     if(cached.conn){
         return cached.conn;
     }
-    if(!cached.promise){//prevents starting multiple connections at the same time.
+    if(!cached.promise){
           const opts = {
             bufferCommands: false,
         }; 

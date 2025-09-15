@@ -7,7 +7,6 @@ import Button from "../../../../../components/ui/Button";
 import Spinner from "../../../../../components/ui/Spinner";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// All your original page logic is now in this component
 export default function LaunchForm() {
   const router = useRouter();
   const searchParams = useSearchParams();

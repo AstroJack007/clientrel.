@@ -60,7 +60,7 @@ async function main() {
   await redisClient.connect();
   console.log("Consumer connected to Redis");
 
-  // Create consumer groups for all streams
+ 
   for (const streamName of Object.keys(STREAMS)) {
     try {
       await redisClient.xGroupCreate(streamName, GROUP_NAME, "0", { MKSTREAM: true });
@@ -97,12 +97,12 @@ async function main() {
           }
         }
       } else {
-        // This part will likely not be reached with BLOCK: 0, but is good practice
+        
         console.log("No new messages, waiting...");
       }
     } catch (err) {
       console.error("Error reading from stream:", err);
-      // Wait for a bit before retrying to avoid spamming errors
+     
       await new Promise(resolve => setTimeout(resolve, 5000));
     }
   }

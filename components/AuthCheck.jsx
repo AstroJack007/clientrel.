@@ -27,7 +27,6 @@ const AuthCheck = ({ children }) => {
     return children;
   }
 
-  // While redirecting unauthenticated users, render nothing
   return null;
 };
 

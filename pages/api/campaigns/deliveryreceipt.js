@@ -11,7 +11,7 @@ export default async function handler(req, res) {
         const { campaignId, customerId, status } = req.body;
         await connect();
 
-        // Ensure proper ObjectId matching in update filter
+     
         const campaignObjectId = mongoose.Types.ObjectId.isValid(campaignId)
             ? new mongoose.Types.ObjectId(campaignId)
             : campaignId;
