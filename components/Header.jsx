@@ -56,7 +56,7 @@ export default function Header() {
                   <span className="max-w-[180px] truncate">{session?.user?.email}</span>
                 </div>
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                   className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
                 >
                   <FontAwesomeIcon icon={faRightFromBracket} />
@@ -106,7 +106,7 @@ export default function Header() {
                 <button
                   onClick={() => {
                     setOpen(false);
-                    signOut();
+                    signOut({ callbackUrl: "/" });
                   }}
                   className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-800"
                 >
