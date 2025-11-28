@@ -3,7 +3,7 @@ import Providers from "./providers";
 import Header from "../../components/Header";
 
 export const metadata = {
-  title: "Xeno CRM",
+  title: "Clientrel CRM",
   description: "Customer engagement platform",
 };
 

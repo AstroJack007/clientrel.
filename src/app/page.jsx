@@ -27,7 +27,7 @@ export default function Page() {
     <div className="min-h-[calc(100vh-64px)] w-full flex flex-col items-center justify-center gap-4 text-center">
       <div className="flex items-center gap-3">
         <FontAwesomeIcon icon={faCubes} className="!h-8 !w-8 text-blue-600" />
-        <p className="text-3xl font-bold">Xeno</p>
+        <p className="text-3xl font-bold">Clientrel</p>
       </div>
       <h1 className="text-2xl sm:text-3xl font-bold">Sign in to your account</h1>
       <p className="text-gray-600">The modern CRM for companies</p>

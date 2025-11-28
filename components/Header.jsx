@@ -34,7 +34,7 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2">
               <FontAwesomeIcon icon={faCubes} className="h-6 w-6 text-blue-600" />
-              <span className="text-lg font-bold tracking-tight">Xeno</span>
+              <span className="text-lg font-bold tracking-tight">Clientrel</span>
             </Link>
           </div>
 
